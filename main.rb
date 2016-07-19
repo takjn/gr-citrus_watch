@@ -1,7 +1,7 @@
 #!mruby
 
 class Application
-    
+
     def initialize
         Rtc.init
         Rtc.setTime([2016, 7, 15, 00, 00, 00])
@@ -10,7 +10,7 @@ class Application
         # Debug.init
         Application.set_mode(:watch)
     end
-    
+
     def self.set_mode(mode)
         @@mode = mode
     end
@@ -26,7 +26,7 @@ class Application
             # キーの読み込み
             key = Key.read
             break if key == Key::BREAK  # for debug
-            
+
             # 表示処理
             Ssd1306.clear_display
             case @@mode
@@ -39,10 +39,10 @@ class Application
                 Calendar.display(key)
             end
             Ssd1306.display
-            
+
             delay(50)
         end
-        
+
         Ssd1306.clear_display;
         Ssd1306.display
     end
@@ -52,10 +52,10 @@ class SetTime
     MODE = ["", "Set year", "Set month", "Set day", "Set hour", "Set minute", "Set second"]
 
     @@cursol = 1
-    
+
     def self.set_time(key)
         year, month, day, hour, minute, second, weekday = Rtc.getTime
-        
+
         case key
         when Key::SELECT
             if @@cursol == 6
@@ -63,16 +63,16 @@ class SetTime
                 Application.set_mode(:watch)
                 return
             end
-            
+
             @@cursol += 1
             Debug.println("cursol=#{@@cursol}")
-            
+
         when Key::NEXT, Key::PREV
             end_of_month=   case month
                             when 2
                                 28
                             when 4, 6, 9, 12
-                                30 
+                                30
                             else
                                 31
                             end
@@ -116,7 +116,7 @@ class SetTime
             when 6
                 second = 0
             end
-            
+
             Rtc.setTime([year, month, day, hour, minute, second])
         end
 
@@ -135,7 +135,7 @@ class SetTime
         when 6
             Ssd1306.draw_line(93, 40, 119, 40);
         end
-        
+
         # モードの表示
         Ssd1306.set_text_size(1);
         Ssd1306.set_cursor(0,63);
@@ -146,13 +146,13 @@ end
 class Calendar
     MONTH = ["January", "Feburary", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
     DAY_SHORT = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"]
-    
+
     COL_PX = 18
     ROW_PX = 7
-    
+
     def self.display(key)
         Ssd1306.set_text_size(1);
-        
+
         year, month, day, hour, minute, second, weekday = Rtc.getTime
 
         Ssd1306.set_text_size(1);
@@ -164,12 +164,12 @@ class Calendar
             Ssd1306.set_cursor(i * COL_PX, 11);
             Ssd1306.print(item);
         end
-        
+
         end_of_month =  case month
                         when 2
                             28
                         when 4, 6, 9, 12
-                            30 
+                            30
                         else
                             31
                         end
@@ -178,7 +178,7 @@ class Calendar
         week = zeller(year, month, 1)
         Debug.println("week= #{week}")
         y = 19
-        
+
         end_of_month.times do |d|
             d += 1
             Ssd1306.set_cursor(week * COL_PX, y)
@@ -187,11 +187,11 @@ class Calendar
             else
                 Ssd1306.print("#{d}")
             end
-            
+
             if d == day
                 Ssd1306.draw_line(week * COL_PX, y + 1, week * COL_PX + 14, y + 1);
             end
-            
+
             if week < 6
                 week += 1
             else
@@ -208,7 +208,7 @@ class Calendar
         Application.set_mode(:watch) if key == Key::PREV
 
     end
-    
+
     def self.zeller(year, month, day)
         case month
         when 1, 2
@@ -216,15 +216,15 @@ class Calendar
             year -=1
         else
             monthind = month
-        end    
-        
+        end
+
         monthind += 1
         monthPart = ((monthind*26)/10).floor
-        
+
         yearPart = year + (year/4).floor
         yearPart += 6*(year/100).floor
         yearPart += (year/400).floor
-        
+
         h = (day + monthPart + yearPart) % 7
         if h == 0
             h = 6
@@ -248,15 +248,9 @@ class Watch
         Ssd1306.print("#{DAY_SHORT[weekday]} #{day} #{MONTH_SHORT[month - 1]} #{year}");
 
         # 時、分の表示
-        str = []
-        str << '0' if hour < 10
-        str << hour
-        str << ':'
-        str << '0' if minute < 10
-        str << minute
         Ssd1306.set_text_size(3);
         Ssd1306.set_cursor(0, 36);
-        Ssd1306.print(str.join)
+        Ssd1306.print("%02d:%02d" % [hour, minute])   # mrbgemのmruby-sprintfが必要
 
         # 秒の表示
         str = []
@@ -286,7 +280,7 @@ class Key
     # pin mode constant
     INPUT_PULLUP = 0x2
     LOW = 0
-    
+
     # pin definition
     PIN_SELECT = 11 # pin for select button
     PIN_PREV = 12   # pin for previous button
@@ -306,7 +300,7 @@ class Key
         pinMode(PIN_NEXT, INPUT_PULLUP)      # set pin to input
         pinMode(PIN_BREAK, INPUT_PULLUP)     # set pin to input
     end
-    
+
     def self.read
         return SELECT if digitalRead(PIN_SELECT) == LOW
         return PREV if digitalRead(PIN_PREV) == LOW
@@ -321,7 +315,7 @@ class Debug
     def self.init
         @@serial = Serial.new(0, 115200)
     end
-    
+
     def self.println(message)
         @@serial.println(message) unless @@serial.nil?
     end
