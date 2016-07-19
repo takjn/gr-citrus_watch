@@ -19,10 +19,8 @@ class Application
         @@mode == mode
     end
 
-
     def run
-
-        while true
+        loop do
             # キーの読み込み
             key = Key.read
             break if key == Key::BREAK  # for debug
@@ -43,6 +41,7 @@ class Application
             delay(50)
         end
 
+        # 終了処理
         Ssd1306.clear_display;
         Ssd1306.display
     end
