@@ -48,6 +48,50 @@ class Application
     end
 end
 
+class CalendarBase
+  MONTH = %w( January Feburary March April May June July August September October November December )
+  MONTH_SHORT = %w( Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec )
+  DAY_SHORT = %w( SUN MON TUE WED THU FRI SAT )
+  DAY_TINY = %w( SU MO TU WE TH FR SA )
+
+  # 月末日を取得
+  def self.get_end_of_month(month)
+    case month
+      when 2
+          28  # TODO:うるう年の考慮はできていない
+      when 4, 6, 9, 12
+          30
+      else
+          31
+      end
+  end
+
+  # 日付から曜日を取得 (戻り値が0=日曜日、6=土曜日)
+  def self.zeller(year, month, day)
+      case month
+      when 1, 2
+          monthind = month + 12
+          year -=1
+      else
+          monthind = month
+      end
+
+      monthind += 1
+      monthPart = ((monthind*26)/10).floor
+
+      yearPart = year + (year/4).floor
+      yearPart += 6*(year/100).floor
+      yearPart += (year/400).floor
+
+      h = (day + monthPart + yearPart) % 7
+      if h == 0
+          h = 6
+      else
+          h -= 1
+      end
+  end
+end
+
 class SetTime < CalendarBase
     MODE = ["", "Set year", "Set month", "Set day", "Set hour", "Set minute", "Set second"]
 
@@ -134,50 +178,6 @@ class SetTime < CalendarBase
         Ssd1306.set_cursor(0,63);
         Ssd1306.print(MODE[@@cursol]);
     end
-end
-
-class CalendarBase
-  MONTH = %w( January Feburary March April May June July August September October November December )
-  MONTH_SHORT = %w( Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec )
-  DAY_SHORT = %w( SUN MON TUE WED THU FRI SAT )
-  DAY_TINY = %w( SU MO TU WE TH FR SA )
-
-  # 月末日を取得
-  def self.get_end_of_month(month)
-    case month
-      when 2
-          28  # TODO:うるう年の考慮はできていない
-      when 4, 6, 9, 12
-          30
-      else
-          31
-      end
-  end
-
-  # 日付から曜日を取得 (戻り値が0=日曜日、6=土曜日)
-  def self.zeller(year, month, day)
-      case month
-      when 1, 2
-          monthind = month + 12
-          year -=1
-      else
-          monthind = month
-      end
-
-      monthind += 1
-      monthPart = ((monthind*26)/10).floor
-
-      yearPart = year + (year/4).floor
-      yearPart += 6*(year/100).floor
-      yearPart += (year/400).floor
-
-      h = (day + monthPart + yearPart) % 7
-      if h == 0
-          h = 6
-      else
-          h -= 1
-      end
-  end
 end
 
 class Calendar < CalendarBase
