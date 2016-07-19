@@ -253,12 +253,9 @@ class Watch
         Ssd1306.print("%02d:%02d" % [hour, minute])   # mrbgemのmruby-sprintfが必要
 
         # 秒の表示
-        str = []
-        str << '0' if second < 10
-        str << second
         Ssd1306.set_text_size(2);
         Ssd1306.set_cursor(93, 37);
-        Ssd1306.print(str.join)
+        Ssd1306.print("%02d" % second)   # mrbgemのmruby-sprintfが必要
 
         # ロゴの表示
         if Application.mode_eq(:watch)
