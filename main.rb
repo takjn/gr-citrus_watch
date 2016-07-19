@@ -48,7 +48,7 @@ class Application
     end
 end
 
-class SetTime
+class SetTime < CalendarBase
     MODE = ["", "Set year", "Set month", "Set day", "Set hour", "Set minute", "Set second"]
 
     @@cursol = 1
@@ -68,14 +68,7 @@ class SetTime
             Debug.println("cursol=#{@@cursol}")
 
         when Key::NEXT, Key::PREV
-            end_of_month=   case month
-                            when 2
-                                28
-                            when 4, 6, 9, 12
-                                30
-                            else
-                                31
-                            end
+            end_of_month = get_end_of_month(month)
 
             case @@cursol
             when 1
@@ -149,6 +142,19 @@ class CalendarBase
   DAY_SHORT = %w( SUN MON TUE WED THU FRI SAT )
   DAY_TINY = %w( SU MO TU WE TH FR SA )
 
+  # 月末日を取得
+  def self.get_end_of_month(month)
+    case month
+      when 2
+          28  # TODO:うるう年の考慮はできていない
+      when 4, 6, 9, 12
+          30
+      else
+          31
+      end
+  end
+
+  # 日付から曜日を取得 (戻り値が0=日曜日、6=土曜日)
   def self.zeller(year, month, day)
       case month
       when 1, 2
@@ -175,12 +181,10 @@ class CalendarBase
 end
 
 class Calendar < CalendarBase
-    COL_PX = 18
-    ROW_PX = 7
+    COL_PX = 18 # 列の幅
+    ROW_PX = 7  # 行の高さ
 
     def self.display(key)
-        Ssd1306.set_text_size(1);
-
         year, month, day, hour, minute, second, weekday = Rtc.getTime
 
         Ssd1306.set_text_size(1);
@@ -193,16 +197,7 @@ class Calendar < CalendarBase
             Ssd1306.print(item);
         end
 
-        end_of_month =  case month
-                        when 2
-                            28
-                        when 4, 6, 9, 12
-                            30
-                        else
-                            31
-                        end
-        # Debug.println("last_day= #{last_day}")
-
+        end_of_month = get_end_of_month(month)
         week = zeller(year, month, 1)
         Debug.println("week= #{week}")
         y = 19
