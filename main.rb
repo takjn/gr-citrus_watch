@@ -143,10 +143,38 @@ class SetTime
     end
 end
 
-class Calendar
-    MONTH = ["January", "Feburary", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-    DAY_SHORT = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"]
+class CalendarBase
+  MONTH = %w( January Feburary March April May June July August September October November December )
+  MONTH_SHORT = %w( Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec )
+  DAY_SHORT = %w( SUN MON TUE WED THU FRI SAT )
+  DAY_TINY = %w( SU MO TU WE TH FR SA )
 
+  def self.zeller(year, month, day)
+      case month
+      when 1, 2
+          monthind = month + 12
+          year -=1
+      else
+          monthind = month
+      end
+
+      monthind += 1
+      monthPart = ((monthind*26)/10).floor
+
+      yearPart = year + (year/4).floor
+      yearPart += 6*(year/100).floor
+      yearPart += (year/400).floor
+
+      h = (day + monthPart + yearPart) % 7
+      if h == 0
+          h = 6
+      else
+          h -= 1
+      end
+  end
+end
+
+class Calendar < CalendarBase
     COL_PX = 18
     ROW_PX = 7
 
@@ -160,7 +188,7 @@ class Calendar
         Ssd1306.print("#{MONTH[month - 1]} #{year}");
 
         # 曜日の表示
-        DAY_SHORT.each_with_index do |item, i|
+        DAY_TINY.each_with_index do |item, i|
             Ssd1306.set_cursor(i * COL_PX, 11);
             Ssd1306.print(item);
         end
@@ -208,37 +236,9 @@ class Calendar
         Application.set_mode(:watch) if key == Key::PREV
 
     end
-
-    def self.zeller(year, month, day)
-        case month
-        when 1, 2
-            monthind = month + 12
-            year -=1
-        else
-            monthind = month
-        end
-
-        monthind += 1
-        monthPart = ((monthind*26)/10).floor
-
-        yearPart = year + (year/4).floor
-        yearPart += 6*(year/100).floor
-        yearPart += (year/400).floor
-
-        h = (day + monthPart + yearPart) % 7
-        if h == 0
-            h = 6
-        else
-            h -= 1
-        end
-    end
-
 end
 
-class Watch
-    DAY_SHORT = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]
-    MONTH_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-
+class Watch < CalendarBase
     def self.display(key)
         year, month, day, hour, minute, second, weekday = Rtc.getTime
 
