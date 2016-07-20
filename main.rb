@@ -224,8 +224,7 @@ class Calendar < CalendarBase
 
         # ロゴの表示
         Ssd1306.set_text_size(1);
-        Ssd1306.set_cursor(0,63);
-        Ssd1306.print("Calendar");
+        Ssd1306.draw_text(0, 63, "Calendar");
 
         Application.set_mode(:watch) if key == Key::PREV
 
@@ -237,25 +236,21 @@ class Watch < CalendarBase
         year, month, day, hour, minute, second, weekday = Rtc.getTime
 
         # 年月日の表示
-        Ssd1306.set_text_size(1);
-        Ssd1306.set_cursor(0, 4);
-        Ssd1306.print("#{DAY_SHORT[weekday]} #{day} #{MONTH_SHORT[month - 1]} #{year}");
+        Ssd1306.set_text_size(1)
+        Ssd1306.draw_text(0, 4, "#{DAY_SHORT[weekday]} #{day} #{MONTH_SHORT[month - 1]} #{year}")
 
         # 時、分の表示
         Ssd1306.set_text_size(3);
-        Ssd1306.set_cursor(0, 36);
-        Ssd1306.print("%02d:%02d" % [hour, minute])   # mrbgemのmruby-sprintfが必要
+        Ssd1306.draw_text(0, 36, "%02d:%02d" % [hour, minute])  # mrbgemのmruby-sprintfが必要
 
         # 秒の表示
         Ssd1306.set_text_size(2);
-        Ssd1306.set_cursor(93, 37);
-        Ssd1306.print("%02d" % second)   # mrbgemのmruby-sprintfが必要
+        Ssd1306.draw_text(93, 37, "%02d" % second)   # mrbgemのmruby-sprintfが必要
 
         # ロゴの表示
         if Application.mode_eq(:watch)
             Ssd1306.set_text_size(1)
-            Ssd1306.set_cursor(0,63)
-            Ssd1306.print("Watch")
+            Ssd1306.draw_text(0, 63, "Watch")
         end
 
         case key
