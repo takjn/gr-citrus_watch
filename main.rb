@@ -58,7 +58,7 @@ class CalendarBase
     case month
       when 2
           28  # TODO:うるう年の考慮はできていない
-      when 4, 6, 9, 12
+      when 4, 6, 9, 11
           30
       else
           31
@@ -92,17 +92,17 @@ class CalendarBase
 end
 
 class SetTime < CalendarBase
-    MODE = ["", "Set year", "Set month", "Set day", "Set hour", "Set minute", "Set second"]
+    MODE = ["Set year", "Set month", "Set day", "Set hour", "Set minute", "Set second"]
 
-    @@cursol = 1
+    @@cursol = 0
 
     def self.set_time(key)
         year, month, day, hour, minute, second, weekday = Rtc.getTime
 
         case key
         when Key::SELECT
-            if @@cursol == 6
-                @@cursol = 1
+            if @@cursol == 5
+                @@cursol = 0
                 Application.set_mode(:watch)
                 return
             end
@@ -114,42 +114,42 @@ class SetTime < CalendarBase
             end_of_month = get_end_of_month(month)
 
             case @@cursol
-            when 1
+            when 0
                 year=   case key
                         when Key::NEXT
                             year + 1
                         when Key::PREV
                             year - 1
                         end
-            when 2
+            when 1
                 month=  case key
                         when Key::NEXT
                             month < 12 ? month + 1 : 1
                         when Key::PREV
                             month > 1 ? month - 1 : 12
                         end
-            when 3
+            when 2
                 day=    case key
                         when Key::NEXT
                             day < end_of_month ? day + 1 : 1
                         when Key::PREV
                             day > 1 ? day - 1 : end_of_month
                         end
-            when 4
+            when 3
                 hour=   case key
                         when Key::NEXT
                             hour < 23 ? hour + 1 : 0
                         when Key::PREV
                             hour > 1  ? hour - 1 : 23
                         end
-            when 5
+            when 4
                 minute= case key
                         when Key::NEXT
                             minute < 59 ? minute + 1 : 0
                         when Key::PREV
                             minute > 1  ? minute - 1 : 59
                         end
-            when 6
+            when 5
                 second = 0
             end
 
@@ -158,17 +158,17 @@ class SetTime < CalendarBase
 
         # カーソルの表示
         case @@cursol
-        when 1
+        when 0
             Ssd1306.draw_line(77, 6, 105-1 , 6);
-        when 2
+        when 1
             Ssd1306.draw_line(49, 6, 70-1 , 6);
-        when 3
+        when 2
             Ssd1306.draw_line(28, 6, 42-1 , 6);
-        when 4
+        when 3
             Ssd1306.draw_line(0, 40, 38, 40);
-        when 5
+        when 4
             Ssd1306.draw_line(51, 40, 88, 40);
-        when 6
+        when 5
             Ssd1306.draw_line(93, 40, 119, 40);
         end
 
