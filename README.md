@@ -9,8 +9,14 @@ AdafruitのGFXライブラリを取り込んだ独自のmrubyファームを使�
 - ブレッドボード & ジャンプワイヤ
 - ボタンスイッチ3個
 
-## 配線図
-あとで書く
+## 配線方法
+- OLEDのSDA -> GR-CITRUSの18ピン
+- OLEDのSCK -> GR-CITRUSの19ピン
+- OLEDのVDD -> GR-CITRUSの3.3V
+- OLEDのGND -> GR-CITRUSのGND
+- GR-CITRUSの10ピン -> ボタンスイッチ -> GND
+- GR-CITRUSの11ピン -> ボタンスイッチ -> GND
+- GR-CITRUSの12ピン -> ボタンスイッチ -> GND
 
 ## 実行方法
 1. githubからzipファイルをダウンロード
