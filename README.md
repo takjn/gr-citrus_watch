@@ -3,6 +3,8 @@
 
 AdafruitのGFXライブラリを取り込んだ独自のmrubyファームを使っています。
 
+![画像](https://raw.githubusercontent.com/takjn/gr-citrus_watch/master/watch.jpg)
+
 ## 必要なもの
 - GR-CITRUS
 - SSD1306 (I2C接続のOLED)
